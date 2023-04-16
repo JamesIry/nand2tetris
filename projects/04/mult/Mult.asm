@@ -9,4 +9,30 @@
 // This program only needs to handle arguments that satisfy
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
 
-// Put your code here.
+// clear R2
+@0
+D=A
+@R2
+M=D
+// loop start
+(LOOP)
+// if r0 == 0 goto end
+@R0
+D=M
+@END
+D;JEQ
+// otherwise, add R1 to R2
+@R1
+D=M
+@R2
+M=M+D
+// decrement R0
+@R0
+M=M-1
+// goto loop
+@LOOP
+0;JMP
+// end loop
+(END)
+@EN0
+0;JMP
