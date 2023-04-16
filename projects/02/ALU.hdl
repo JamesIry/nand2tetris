@@ -6,7 +6,7 @@
 /**
  * The ALU (Arithmetic Logic Unit).
  * Computes one of the following functions:
- * x+y, x-y, y-x, 0, 1, -1, x, y, -x, -y, !x, !y,
+ * x+y, x-y, y-x, 0, 1, -1, x, y, -x, -y, !x, !y, 
  * x+1, y+1, x-1, y-1, x&y, x|y on two 16-bit inputs, 
  * according to 6 input bits denoted zx,nx,zy,ny,f,no.
  * In addition, the ALU computes two 1-bit outputs:
@@ -42,5 +42,28 @@ CHIP ALU {
         ng; // 1 if (out < 0),  0 otherwise
 
     PARTS:
-   // Put you code here:
+        //zxo, zyo - possibly zero'd x and y
+        Mux16(a=x, b[0..15]=false, sel=zx, out=zxo);
+        Mux16(a=y, b[0..15]=false, sel=zy, out=zyo);
+        //nxo, nyo - maybe inverted zxo and zyo
+        Not16(in=zxo, out=txo);
+        Not16(in=zyo, out=tyo);
+        Mux16(a=zxo, b=txo, sel=nx, out=nxo);
+        Mux16(a=zyo, b=tyo, sel=ny, out=nyo);
+        //added, anded - nxo and nyo added and anded
+        And16(a=nxo, b=nyo, out=anded);
+        Add16(a=nxo, b=nyo, out=added);
+        //computed = anded or added selected by f
+        Mux16(a=anded, b=added, sel=f, out=computed);
+        //ncomputed = computed inverted
+        Not16(in=computed, out=ncomputed);
+        //out, result - selection between computed and ncomputed
+        //also computes ng from high bit of result and the
+        //low and high bitwise
+        Mux16(a=computed, b=ncomputed, sel=no, out[0..7]=result1, out[8..15]=result2, out=out, out[15]=ng);
+        //zr - if none of the bits are 1
+        Or8Way(in=result1, out=ored1);
+        Or8Way(in=result2, out=ored2);
+        Or(a=ored1, b=ored2, out=t);
+        Not(in=t, out=zr);
 }
