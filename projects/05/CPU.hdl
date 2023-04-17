@@ -97,9 +97,8 @@ CHIP CPU {
         // load from aout if jump condition is true
         // otherwise inc
 
-        Or(a=ng, b=zr, out=lte);
-        Mux(a=JLT, b=JEQ, sel=zr, out=ltVsEq);
-        Mux(a=JGT, b=ltVsEq, sel=lte, out=jumppc);
+        Mux(a=JGT, b=JEQ, sel=zr, out=gtVsEq);
+        Mux(a=gtVsEq, b=JLT, sel=ng, out=jumppc);
 
         PC(in=aout,load=jumppc,inc=true,reset=reset,out[0..14]=pc);
 }
