@@ -96,19 +96,10 @@ CHIP CPU {
         // compute the next PC
         // load from aout if jump condition is true
         // otherwise inc
-        
-        And(a=JEQ,b=zr,out=jump1);
 
-        Not(in=zr,out=notzr);
-        And(a=notzr,b=ng,out=lt);
-        And(a=lt,b=JLT,out=jump2);
-
-        Not(in=ng,out=gte);
-        And(a=notzr,b=gte,out=gt);
-        And(a=gt,b=JGT,out=jump3);
-
-        Or(a=jump1,b=jump2,out=jump4);
-        Or(a=jump3,b=jump4,out=jumppc);
+        Or(a=ng, b=zr, out=lte);
+        Mux(a=JLT, b=JEQ, sel=zr, out=ltVsEq);
+        Mux(a=JGT, b=ltVsEq, sel=lte, out=jumppc);
 
         PC(in=aout,load=jumppc,inc=true,reset=reset,out[0..14]=pc);
 }
