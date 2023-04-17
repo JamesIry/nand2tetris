@@ -27,5 +27,15 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+        // if address >= $6000 then it's keyboard (address[14] == 1 && address[13] == 1)
+        // otherwise if address >= $4000 then it's screen (address[14] == 1 && address[13]=0)
+        // otherwise it's ram (address[14] == 0 && address[13]=0 or 1)
+
+        DMux4Way(in=load, sel=address[13..14], a=ramload1, b=ramload2, c=screenload, d=keyload);
+        Or(a=ramload1, b=ramload2, out=ramload);
+
+        RAM16K(in=in, load=ramload, address=address[0..13], out=ramout);
+        Screen(in=in, load=screenload, address=address[0..12], out=screenout);
+        Keyboard(out=keyout);
+        Mux4Way16(a=ramout, b=ramout, c=screenout, d=keyout, sel=address[13..14], out=out);
 }

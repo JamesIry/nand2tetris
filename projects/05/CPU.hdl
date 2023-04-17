@@ -39,5 +39,76 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+        // instruction[15] == 0 -> A instruction, meaning load instruction[0..14] into A register
+        // instruction[15] == 1 -> C instruction, 1xxaccccccdddjjj
+        //                                           a              == 0 -> ALU in from A, 1 -> ALU in from inM
+        //                                            cccccc        == control bits for ALU
+        //                                                              x = D, y = A/M
+        //                                                              1xxxxx -> zx (zero x)
+        //                                                              x1xxxx -> nx (negate x) 
+        //                                                              xx1xxx -> zy (zero y)
+        //                                                              xxx1xx -> ny (negate y) 
+        //                                                              xxxx1x -> f  (0=and, 1=add) 
+        //                                                              xxxxx1 -> no (negate output) 
+        //                                                  ddd     == dest
+        //                                                              000 -> not stored
+        //                                                                store to all the follwing, e.g. 011 -> D reg and RAM[A]
+        //                                                              xx1 -> RAM[A]
+        //                                                              x1x -> D reg
+        //                                                              1xx -> A reg
+        //                                                     jjj  == jump
+        //                                                              000 -> no jump
+        //                                                               "or" the following, e.g. 011 = GT or EQ, aka GE
+        //                                                              xx1 -> GT
+        //                                                              010 -> EQ
+        //                                                              100 -> LT 
+
+        // control bits, but only if C instruction
+        And(a=instruction[15],b=instruction[12],out=aluFromM);
+        And(a=instruction[15],b=instruction[11],out=zx);
+        And(a=instruction[15],b=instruction[10],out=nx);
+        And(a=instruction[15],b=instruction[9],out=zy);
+        And(a=instruction[15],b=instruction[8],out=ny);
+        And(a=instruction[15],b=instruction[7],out=f);
+        And(a=instruction[15],b=instruction[6],out=no);
+        And(a=instruction[15],b=instruction[5],out=writeA);
+        And(a=instruction[15],b=instruction[4],out=writeD);
+        And(a=instruction[15],b=instruction[3],out=writeM);
+        And(a=instruction[15],b=instruction[2],out=JLT);     
+        And(a=instruction[15],b=instruction[1],out=JEQ);
+        And(a=instruction[15],b=instruction[0],out=JGT);
+
+        // D register / x
+        DRegister(in=aluout,load=writeD,out=x);
+
+        // store A instruction into A reg or store ALU output into A reg
+        Not(in=instruction[15], out=ainstruction);
+        Mux16(a=aluout, b[0..14]=instruction[0..14], sel=ainstruction, out=ain);
+        Or(a=ainstruction, b=writeA, out=aload);
+        ARegister(in=ain, load=aload, out=aout, out[0..14]=addressM);
+
+        // A or M -> y
+        Mux16(a=aout, b=inM, sel=aluFromM, out=y);
+
+        // the ALU is simple now
+        ALU(x=x, y=y, zx=zx, nx=nx, zy=zy, ny=ny,f=f, no=no, out=aluout, out=outM, zr=zr, ng=ng);
+
+        // compute the next PC
+        // load from aout if jump condition is true
+        // otherwise inc
+        
+        And(a=JEQ,b=zr,out=jump1);
+
+        Not(in=zr,out=notzr);
+        And(a=notzr,b=ng,out=lt);
+        And(a=lt,b=JLT,out=jump2);
+
+        Not(in=ng,out=gte);
+        And(a=notzr,b=gte,out=gt);
+        And(a=gt,b=JGT,out=jump3);
+
+        Or(a=jump1,b=jump2,out=jump4);
+        Or(a=jump3,b=jump4,out=jumppc);
+
+        PC(in=aout,load=jumppc,inc=true,reset=reset,out[0..14]=pc);
 }
