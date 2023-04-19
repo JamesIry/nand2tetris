@@ -18,21 +18,24 @@ fn main() -> std::io::Result<()> {
         let input_file = File::open(&input_filename)?;
         let reader = BufReader::new(input_file);
         let lines = reader.lines().map(|line| line.unwrap());
-        let (instructions, errors) = parser::parse_lines(lines);
-        if !errors.is_empty() {
-            errors.iter().for_each(|error| println!("{:?}", error));
-        } else {
-            let symbol_table = analyzer::analyze(instructions.iter());
-            let codes = emitter::emit_instructions(instructions.iter(), &symbol_table);
-
-            let output_filename = create_output_filename(&input_filename);
-            println!("Creating {output_filename}");
-            let output_file = File::create(output_filename)?;
-            let mut writer = BufWriter::new(output_file);
-            for code in codes {
-                writeln!(writer, "{}", bits(code))?;
+        let results = parser::parse_lines(lines);
+        match results {
+            Err(errors) => {
+                errors.iter().for_each(|error| println!("{:?}", error));
             }
-        }
+            Ok(instructions) => {
+                let symbol_table = analyzer::analyze(instructions.iter());
+                let codes = emitter::emit_instructions(instructions.iter(), &symbol_table);
+
+                let output_filename = create_output_filename(&input_filename);
+                println!("Creating {output_filename}");
+                let output_file = File::create(output_filename)?;
+                let mut writer = BufWriter::new(output_file);
+                for code in codes {
+                    writeln!(writer, "{}", bits(code))?;
+                }
+            }
+        };
     }
     Ok(())
 }

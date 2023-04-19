@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::ast::*;
 
-pub fn parse_lines<T, S>(lines: T) -> (Vec<Instruction>, Vec<(usize, ParseError)>)
+pub fn parse_lines<T, S>(lines: T) -> Result<Vec<Instruction>, Vec<(usize, ParseError)>>
 where
     T: IntoIterator<Item = S>,
     S: AsRef<str>,
@@ -21,7 +21,11 @@ where
             Err(error) => errors.push((line, error)),
         }
     }
-    (instructions, errors)
+    if errors.is_empty() {
+        Ok(instructions)
+    } else {
+        Err(errors)
+    }
 }
 
 fn parse_line(line: &str) -> Option<Result<Instruction, ParseError>> {
@@ -426,21 +430,23 @@ mod test {
 
     #[test]
     fn test_parse_lines() {
-        let results = parse_lines(vec!["  (abc) ", "   ", "  // flub", "dog", "D+M", "cat"]);
-
+        let instructions = parse_lines(vec!["  (abc) ", "   ", "  // flub", "D+M"]);
         assert_eq!(
-            results.0,
-            vec![
+            instructions,
+            Ok(vec![
                 Instruction::L("abc".to_string()),
                 Instruction::C(HashSet::new(), Expr::DAddM, Jump::Null)
-            ]
+            ])
         );
+
+        let errors = parse_lines(vec!["  (abc) ", "   ", "  // flub", "dog", "D+M", "cat"]);
+
         assert_eq!(
-            results.1,
-            vec![
+            errors,
+            Err(vec![
                 (3, ParseError::InvalidExpr("dog".to_string())),
                 (5, ParseError::InvalidExpr("cat".to_string()))
-            ]
+            ])
         );
     }
 }
