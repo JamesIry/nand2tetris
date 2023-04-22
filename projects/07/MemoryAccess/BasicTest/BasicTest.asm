@@ -1,3 +1,9 @@
+// // This file is part of www.nand2tetris.org
+// // and the book "The Elements of Computing Systems"
+// // by Nisan and Schocken, MIT Press.
+// // File name: projects/07/MemoryAccess/BasicTest/BasicTest.vm
+// 
+// // Executes pop and push commands using the virtual memory segments.
 // push constant 10
 @10
 D=A
@@ -126,11 +132,18 @@ M=M+1
 A=M-1
 M=D
 // pop temp 6
+@R5
+D=A
+@6
+D=D+A
+@R13
+M=D
 @SP
 M=M-1
 A=M
 D=M
-@11
+@R13
+A=M
 M=D
 // push local 0
 @LCL
@@ -213,7 +226,10 @@ D=M
 A=A-1
 M=M-D
 // push temp 6
-@11
+@6
+D=A
+@R5
+A=A+D
 D=M
 @SP
 M=M+1

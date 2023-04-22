@@ -13,7 +13,32 @@ pub fn print_command(command: &Command) -> String {
         Command::And => "and".to_string(),
         Command::Or => "or".to_string(),
         Command::Not => "not".to_string(),
+        Command::Goto(label) => print_command2("goto", label),
+        Command::IfGoto(label) => print_command2("if-goto", label),
+        Command::Label(label) => print_command2("label", label),
+        Command::Function(function, n_locals) => {
+            print_command3("function", function, &n_locals.to_string())
+        }
+        Command::Call(function, n_args) => print_command3("call", function, &n_args.to_string()),
+        Command::Return => "return".to_string(),
+        Command::Comment(comment) => comment.clone(),
     }
+}
+
+fn print_command2(command: &str, label: &str) -> String {
+    let mut result = command.to_string();
+    result.push(' ');
+    result.push_str(label);
+    result
+}
+
+fn print_command3(command: &str, arg1: &str, arg2: &str) -> String {
+    let mut result = command.to_string();
+    result.push(' ');
+    result.push_str(arg1);
+    result.push(' ');
+    result.push_str(arg2);
+    result
 }
 
 fn print_push_pop(arg: &str, segment: &Segment, index: u16) -> String {
@@ -84,5 +109,22 @@ mod test {
         assert_eq!(print_command(&Command::And), "and");
         assert_eq!(print_command(&Command::Or), "or");
         assert_eq!(print_command(&Command::Not), "not");
+        assert_eq!(
+            print_command(&Command::Goto("LOOP".to_string())),
+            "goto LOOP"
+        );
+        assert_eq!(
+            print_command(&Command::IfGoto("LOOP".to_string())),
+            "if-goto LOOP"
+        );
+
+        assert_eq!(
+            print_command(&Command::Label("LOOP".to_string())),
+            "label LOOP"
+        );
+        assert_eq!(
+            print_command(&Command::Comment("// foo".to_string())),
+            "// foo"
+        );
     }
 }
