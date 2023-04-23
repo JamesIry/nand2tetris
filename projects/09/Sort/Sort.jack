@@ -1,0 +1,52 @@
+// Very simple quicksort implementation
+// don't care about doing more sophisticat
+// things like hoare partitioning or
+// median of 3 pivot selection since
+// the point is just to play with the
+// Jack language
+class Sort {
+   function void sort(Array a, int length) {
+      do Sort.sortSlice(a, 0, length-1);
+
+      return;
+   }
+
+
+   function void sortSlice(Array a, int start, int end) {
+      var int pivot, i, j;
+
+      if ((start > end) | (start = end) | (start < 0)) {
+         return;
+      }
+
+      let pivot = a[end];
+
+      let i = start-1;
+      let j = start;
+      while (j < end) {
+         if ((a[j]<pivot) | (a[j]=pivot)) {
+            let i = i + 1;
+            do Sort.swap(a, i, j);
+         }
+         let j = j + 1;
+      }
+
+      let i = i + 1;
+      do Sort.swap(a, i, end);
+
+      do Sort.sortSlice(a, start, i-1);
+      do Sort.sortSlice(a, i+1, end);
+
+      return;
+   }
+
+   function void swap(Array a, int i, int j) {
+      var int temp;
+
+      let temp=a[j];
+      let a[j]=a[i];
+      let a[i]=temp;
+
+      return;
+   }
+}
