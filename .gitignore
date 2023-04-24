@@ -5,3 +5,4 @@ tools/*
 
 /asm/target
 /vm/target
+/compile/target
