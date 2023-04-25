@@ -7,6 +7,8 @@
 // until it's ready to emit a token. These two things greatly reduce
 // the number of states the tokenizer can be in.
 
+use std::fmt::Display;
+
 use thiserror::Error;
 
 #[derive(Clone, Eq, PartialEq, Debug)]
@@ -16,6 +18,22 @@ pub enum Token {
     Identifier(String),
     Symbol(char),
     Keyword(&'static str),
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Token::IntegerLiteral(n) => n.to_string(),
+                Token::StringLiteral(s) => "\"".to_string() + s + "\"",
+                Token::Identifier(s) => s.to_string(),
+                Token::Symbol(c) => c.to_string(),
+                Token::Keyword(s) => s.to_string(),
+            }
+        )
+    }
 }
 
 #[derive(Debug, Error)]
