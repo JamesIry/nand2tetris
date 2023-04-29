@@ -1,0 +1,38 @@
+<symbol_table>
+  <class>
+    <name> Main </name>
+    <function>
+      <name> fill </name>
+      <arg>
+        <name> a </name>
+        <number> 0 </number>
+      </arg>
+      <arg>
+        <name> size </name>
+        <number> 1 </number>
+      </arg>
+    </function>
+    <function>
+      <name> main </name>
+      <local>
+        <name> a </name>
+        <number> 0 </number>
+      </local>
+      <local>
+        <name> b </name>
+        <number> 1 </number>
+      </local>
+      <local>
+        <name> c </name>
+        <number> 2 </number>
+      </local>
+    </function>
+    <function>
+      <name> double </name>
+      <arg>
+        <name> a </name>
+        <number> 0 </number>
+      </arg>
+    </function>
+  </class>
+</symbol_table>

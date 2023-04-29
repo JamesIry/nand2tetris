@@ -1,3 +1,5 @@
+use crate::tokenizer::*;
+use thiserror::Error;
 #[derive(Debug, Eq, PartialEq)]
 pub struct Class {
     pub name: String,
@@ -12,7 +14,7 @@ pub struct ClassVarDecl {
     pub declarations: Vec<String>,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum ClassVarDecorator {
     Static,
     Field,
@@ -48,7 +50,7 @@ pub struct ParamDecl {
     pub name: String,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Copy, Clone)]
 pub enum SubroutineDecorator {
     Constructor,
     Function,
@@ -74,11 +76,11 @@ pub enum Statement {
         condition: Expr,
         statements: Vec<Statement>,
     },
-    // do expr
+    // do expr;
     Do {
         expr: Expr,
     },
-    // return expr
+    // return expr;
     Return {
         expr: Option<Expr>,
     },
@@ -128,4 +130,52 @@ pub enum Op {
 pub enum UnaryOp {
     Neg,
     Not,
+}
+
+#[derive(Error, Debug)]
+pub enum ParseError {
+    #[error("{0}")]
+    TokenError(TokenError),
+    #[error("Unexpected token {0}")]
+    UnexpectedToken(Token),
+    #[error("Expected expresion but none found")]
+    MissingExpr,
+    #[error("Parenethesis not closed")]
+    MissingClosingParen,
+    #[error("Square brackets not close")]
+    MissingClosingBracket,
+    #[error("Missing subroutine name after '.'")]
+    MissingSubroutineName,
+    #[error("Missing opening paren on subroutine")]
+    MissingOpeningParen,
+    #[error("Missing opening curly brace")]
+    MissingOpeningCurly,
+    #[error("Missing closing curly brace")]
+    MissingClosingCurly,
+    #[error("Missing variable name")]
+    MissingVariable,
+    #[error("Missing equals in let statement")]
+    MissingEquals,
+    #[error("Do statements must only be a single subroutine call")]
+    DoStatementMustBeSubroutineCall,
+    #[error("No class declaration found")]
+    MissingClassDeclaration,
+    #[error("No class name found")]
+    MissingClassName,
+    #[error("Missing type specifier")]
+    MissingType,
+    #[error("Missing semicolon")]
+    MissingSemicolon,
+    #[error("Could not find class")]
+    ClassNotFound,
+    #[error("Class was duplicated")]
+    DuplicatedClass,
+    #[error("Class level var was duplicated")]
+    DuplicatedClassLevelVariable,
+    #[error("Subroutine was duplicated")]
+    DuplicatedSubroutine,
+    #[error("Subroutine level var was duplicated")]
+    DuplicatedFuncitonLevelVariable,
+    //   #[error("Could not find symbol")]
+    //   SymbolNotFound,
 }

@@ -1,7 +1,6 @@
-use thiserror::Error;
-
 use crate::ast::*;
 
+use crate::symbol_table::SymbolTable;
 use crate::tokenizer::*;
 
 // parser for Jack. In keeping with the exercise this is a
@@ -25,14 +24,15 @@ where
         }
     }
 
-    pub fn parse_class(&mut self) -> Result<Class, ParseError> {
+    pub fn parse_class(&mut self, symbol_table: &mut SymbolTable) -> Result<Class, ParseError> {
         if !self.check_token(Token::Keyword("class"))? {
             Err(ParseError::MissingClassDeclaration)
         } else {
             let name = self.parse_identifier(ParseError::MissingClassName)?;
+            symbol_table.enter_class(name.clone())?;
             self.require_opening_curly(())?;
-            let vars = self.parse_class_vars()?;
-            let subroutines = self.parse_subroutines()?;
+            let vars = self.parse_class_vars(symbol_table)?;
+            let subroutines = self.parse_subroutines(symbol_table)?;
             let class = Class {
                 name,
                 vars,
@@ -47,10 +47,13 @@ where
         }
     }
 
-    fn parse_class_vars(&mut self) -> Result<Vec<ClassVarDecl>, ParseError> {
+    fn parse_class_vars(
+        &mut self,
+        symbol_table: &mut SymbolTable,
+    ) -> Result<Vec<ClassVarDecl>, ParseError> {
         let mut class_vars = Vec::new();
         loop {
-            let class_var_decl = self.parse_class_var_decl_opt()?;
+            let class_var_decl = self.parse_class_var_decl_opt(symbol_table)?;
             match class_var_decl {
                 Some(c) => class_vars.push(c),
                 None => break Ok(class_vars),
@@ -58,10 +61,16 @@ where
         }
     }
 
-    fn parse_class_var_decl_opt(&mut self) -> Result<Option<ClassVarDecl>, ParseError> {
+    fn parse_class_var_decl_opt(
+        &mut self,
+        symbol_table: &mut SymbolTable,
+    ) -> Result<Option<ClassVarDecl>, ParseError> {
         let decorator = self.parse_class_var_decorator_opt()?;
         if let Some(decorator) = decorator {
             let (type_name, declarations) = self.parse_var_declarations()?;
+            for name in &declarations {
+                symbol_table.enter_class_var(name.clone(), decorator)?;
+            }
             Ok(Some(ClassVarDecl {
                 decorator,
                 type_name,
@@ -84,10 +93,13 @@ where
         })
     }
 
-    fn parse_subroutines(&mut self) -> Result<Vec<Subroutine>, ParseError> {
+    fn parse_subroutines(
+        &mut self,
+        symbol_table: &mut SymbolTable,
+    ) -> Result<Vec<Subroutine>, ParseError> {
         let mut subroutines = Vec::new();
         loop {
-            let subroutine = self.parse_subroutine_opt()?;
+            let subroutine = self.parse_subroutine_opt(symbol_table)?;
             match subroutine {
                 Some(s) => subroutines.push(s),
                 None => break Ok(subroutines),
@@ -95,7 +107,10 @@ where
         }
     }
 
-    fn parse_subroutine_opt(&mut self) -> Result<Option<Subroutine>, ParseError> {
+    fn parse_subroutine_opt(
+        &mut self,
+        symbol_table: &mut SymbolTable,
+    ) -> Result<Option<Subroutine>, ParseError> {
         let decorator = self.parse_subroutine_decorator_opt()?;
         if let Some(decorator) = decorator {
             let type_name = if self.check_token(Token::Keyword("void"))? {
@@ -104,9 +119,10 @@ where
                 Some(self.parse_type()?)
             };
             let name = self.parse_identifier(ParseError::MissingSubroutineName)?;
-            let params = self.parse_params()?;
+            symbol_table.enter_subroutine(name.clone(), decorator)?;
+            let params = self.parse_params(symbol_table)?;
             self.require_opening_curly(())?;
-            let vars = self.parse_subroutine_vars()?;
+            let vars = self.parse_subroutine_vars(symbol_table)?;
             let statements = self.parse_statement_list()?;
             self.require_closing_curly(())?;
             Ok(Some(Subroutine {
@@ -122,27 +138,31 @@ where
         }
     }
 
-    fn parse_params(&mut self) -> Result<Vec<ParamDecl>, ParseError> {
+    fn parse_params(
+        &mut self,
+        symbol_table: &mut SymbolTable,
+    ) -> Result<Vec<ParamDecl>, ParseError> {
         self.require_opening_paren(())?;
         let mut params = Vec::new();
         if self.check_token(Token::Symbol(')'))? {
             Ok(params)
         } else {
-            let param = self.parse_param()?;
+            let param = self.parse_param(symbol_table)?;
             params.push(param);
             loop {
                 if !self.check_token(Token::Symbol(','))? {
                     break self.require_closing_paren(params);
                 }
-                let param = self.parse_param()?;
+                let param = self.parse_param(symbol_table)?;
                 params.push(param);
             }
         }
     }
 
-    fn parse_param(&mut self) -> Result<ParamDecl, ParseError> {
+    fn parse_param(&mut self, symbol_table: &mut SymbolTable) -> Result<ParamDecl, ParseError> {
         let type_name = self.parse_type()?;
         let name = self.parse_identifier(ParseError::MissingVariable)?;
+        symbol_table.enter_arg(name.clone())?;
         Ok(ParamDecl { type_name, name })
     }
 
@@ -161,19 +181,28 @@ where
         })
     }
 
-    fn parse_subroutine_vars(&mut self) -> Result<Vec<SubroutineVarDecl>, ParseError> {
+    fn parse_subroutine_vars(
+        &mut self,
+        symbol_table: &mut SymbolTable,
+    ) -> Result<Vec<SubroutineVarDecl>, ParseError> {
         let mut subroutine_vars = Vec::new();
         loop {
             if !self.check_token(Token::Keyword("var"))? {
                 break Ok(subroutine_vars);
             }
-            let subroutine_decl = self.parse_subroutine_var_decl()?;
+            let subroutine_decl = self.parse_subroutine_var_decl(symbol_table)?;
             subroutine_vars.push(subroutine_decl);
         }
     }
 
-    fn parse_subroutine_var_decl(&mut self) -> Result<SubroutineVarDecl, ParseError> {
+    fn parse_subroutine_var_decl(
+        &mut self,
+        symbol_table: &mut SymbolTable,
+    ) -> Result<SubroutineVarDecl, ParseError> {
         let (type_name, declarations) = self.parse_var_declarations()?;
+        for name in &declarations {
+            symbol_table.enter_local(name.clone())?;
+        }
         Ok(SubroutineVarDecl {
             type_name,
             declarations,
@@ -538,40 +567,4 @@ where
             Err(error)
         }
     }
-}
-
-#[derive(Error, Debug)]
-pub enum ParseError {
-    #[error("{0}")]
-    TokenError(TokenError),
-    #[error("Unexpected token {0}")]
-    UnexpectedToken(Token),
-    #[error("Expected expresion but none found")]
-    MissingExpr,
-    #[error("Parenethesis not closed")]
-    MissingClosingParen,
-    #[error("Square brackets not close")]
-    MissingClosingBracket,
-    #[error("Missing subroutine name after '.'")]
-    MissingSubroutineName,
-    #[error("Missing opening paren on subroutine")]
-    MissingOpeningParen,
-    #[error("Missing opening curly brace")]
-    MissingOpeningCurly,
-    #[error("Missing closing curly brace")]
-    MissingClosingCurly,
-    #[error("Missing variable name")]
-    MissingVariable,
-    #[error("Missing equals in let statement")]
-    MissingEquals,
-    #[error("Do statements must only be a single subroutine call")]
-    DoStatementMustBeSubroutineCall,
-    #[error("No class declaration found")]
-    MissingClassDeclaration,
-    #[error("No class name found")]
-    MissingClassName,
-    #[error("Missing type specifier")]
-    MissingType,
-    #[error("Missing semicolon")]
-    MissingSemicolon,
 }

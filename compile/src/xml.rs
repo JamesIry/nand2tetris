@@ -1,4 +1,7 @@
-use crate::ast::*;
+use crate::{
+    ast::*,
+    symbol_table::{ClassSymbolTable, SubroutineSymbolTable, SubroutineVarDecorator, SymbolTable},
+};
 use std::io::{BufWriter, Result, Write};
 
 pub struct Xml<T>
@@ -83,6 +86,100 @@ where
 
         self.symbol(indent + 1, "}")?;
         self.end(indent, "class")?;
+        Ok(())
+    }
+
+    pub fn write_symbol_table(&mut self, symbol_table: &SymbolTable) -> Result<()> {
+        self.start(0, "symbol_table")?;
+        for (class, table) in symbol_table.classes.iter() {
+            self.class_symbol(1, class, table)?;
+        }
+
+        self.end(0, "symbol_table")?;
+        Ok(())
+    }
+
+    fn class_symbol(&mut self, indent: usize, name: &str, table: &ClassSymbolTable) -> Result<()> {
+        self.start(indent, "class")?;
+
+        self.leaf(indent + 1, "name", name)?;
+
+        for (name, (decorator, number)) in &table.class_vars {
+            self.class_var_symbol(indent + 1, name, decorator, *number)?;
+        }
+
+        for (subroutine, table) in &table.subroutines {
+            self.subroutine_symbol(indent + 1, subroutine, table)?;
+        }
+
+        self.end(indent, "class")?;
+        Ok(())
+    }
+
+    fn class_var_symbol(
+        &mut self,
+        indent: usize,
+        name: &str,
+        decorator: &ClassVarDecorator,
+        number: usize,
+    ) -> Result<()> {
+        let var_type = match decorator {
+            ClassVarDecorator::Static => "static",
+            ClassVarDecorator::Field => "field",
+        };
+        self.var_symbol(indent, var_type, name, number)
+    }
+
+    fn subroutine_symbol(
+        &mut self,
+        indent: usize,
+        name: &str,
+        table: &SubroutineSymbolTable,
+    ) -> Result<()> {
+        let decorator = table.decorator;
+        let sub_type = match decorator {
+            SubroutineDecorator::Constructor => "constructor",
+            SubroutineDecorator::Function => "function",
+            SubroutineDecorator::Method => "method",
+        };
+        self.start(indent, sub_type)?;
+        self.leaf(indent + 1, "name", name)?;
+
+        for (var, (decorator, number)) in &table.vars {
+            self.subroutine_var_symbol(indent + 1, var, decorator, *number)?;
+        }
+
+        self.end(indent, sub_type)?;
+        Ok(())
+    }
+
+    fn subroutine_var_symbol(
+        &mut self,
+        indent: usize,
+        name: &str,
+        decorator: &SubroutineVarDecorator,
+        number: usize,
+    ) -> Result<()> {
+        let var_type = match decorator {
+            SubroutineVarDecorator::Arg => "arg",
+            SubroutineVarDecorator::Local => "local",
+        };
+
+        self.var_symbol(indent, var_type, name, number)
+    }
+
+    fn var_symbol(
+        &mut self,
+        indent: usize,
+        var_type: &str,
+        name: &str,
+        number: usize,
+    ) -> std::result::Result<(), std::io::Error> {
+        self.start(indent, var_type)?;
+        self.leaf(indent + 1, "name", name)?;
+        self.leaf(indent + 1, "number", &number.to_string())?;
+
+        self.end(indent, var_type)?;
         Ok(())
     }
 

@@ -1,4 +1,5 @@
 use anyhow::Result;
+use ast::Class;
 use std::{
     env::args,
     fs::File,
@@ -7,19 +8,21 @@ use std::{
 };
 use utf8_chars::BufReadCharsExt;
 
-use crate::{parser::Parser, tokenizer::Tokenizer};
+use crate::{parser::Parser, symbol_table::SymbolTable, tokenizer::Tokenizer};
 
 mod ast;
 mod parser;
+mod symbol_table;
 mod tokenizer;
 mod xml;
 
 use crate::xml::*;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Eq, PartialEq)]
 enum Output {
     Tokens,
     Ast,
+    SymbolTable,
     Vm,
 }
 
@@ -32,6 +35,7 @@ fn main() -> Result<()> {
             match args[2].as_str() {
                 "-output=tokens" => Output::Tokens,
                 "-output=ast" => Output::Ast,
+                "-output=symbol_table" => Output::SymbolTable,
                 "-output=vm" => Output::Vm,
                 _ => panic!("Unrecognized option {0}", args[2]),
             }
@@ -40,19 +44,29 @@ fn main() -> Result<()> {
         };
         let input_name = args[1].as_str();
         let input_path = Path::new(input_name);
-        let (input_files, output_path) = create_output_path(input_path);
-        println!("Creating {}", output_path.to_string_lossy());
-        let output_file = File::create(&output_path)?;
-
+        let (input_files, symbol_table_output_path) = create_output_path(input_path);
+        let mut symbol_table = SymbolTable::new();
         for input_file in input_files {
-            compile_file(input_file.as_path(), &output_file, output)?;
+            compile_file(input_file.as_path(), output, &mut symbol_table)?;
+        }
+
+        if output == Output::SymbolTable {
+            println!("Creating {}", symbol_table_output_path.to_string_lossy());
+            let file = File::create(&symbol_table_output_path)?;
+            let writer = BufWriter::new(file);
+            let mut xml = Xml::new(writer);
+            xml.write_symbol_table(&symbol_table)?;
         }
     }
 
     Ok(())
 }
 
-fn compile_file(input_path: &Path, _output_file: &File, output: Output) -> Result<()> {
+fn compile_file(
+    input_path: &Path,
+    output: Output,
+    symbol_table: &mut SymbolTable,
+) -> Result<Option<Class>> {
     println!("Compiling {}", input_path.to_string_lossy());
 
     let input_file = File::open(input_path)?;
@@ -86,11 +100,11 @@ fn compile_file(input_path: &Path, _output_file: &File, output: Output) -> Resul
                 xml.leaf(0, element, &value)?;
             }
             xml.end(0, "tokens")?;
-            Ok(())
+            Ok(None)
         }
         Output::Ast => {
             let mut parser = Parser::new(tokens);
-            let ast = parser.parse_class().unwrap();
+            let ast = parser.parse_class(symbol_table)?;
 
             let mut path = input_path.to_path_buf();
             path.set_extension("gen.xml");
@@ -100,7 +114,12 @@ fn compile_file(input_path: &Path, _output_file: &File, output: Output) -> Resul
             let writer = BufWriter::new(file);
             let mut xml = Xml::new(writer);
             xml.write_ast(ast)?;
-            Ok(())
+            Ok(None)
+        }
+        Output::SymbolTable => {
+            let mut parser = Parser::new(tokens);
+            parser.parse_class(symbol_table)?;
+            Ok(None)
         }
         Output::Vm => {
             todo!()
@@ -114,7 +133,7 @@ fn create_output_path(input_path: &Path) -> (Vec<PathBuf>, PathBuf) {
         .unwrap()
         .to_string_lossy()
         .into_owned();
-    let (files, mut output_path) = if input_path.is_file() {
+    let (files, mut symbol_table_output_path) = if input_path.is_file() {
         (vec![PathBuf::from(input_path)], PathBuf::from(input_path))
     } else if input_path.is_dir() {
         let files = input_path
@@ -132,11 +151,11 @@ fn create_output_path(input_path: &Path) -> (Vec<PathBuf>, PathBuf) {
             })
             .collect();
 
-        let output_path = PathBuf::from(input_path).join(base_name);
-        (files, output_path)
+        let symbol_table_output_path = PathBuf::from(input_path).join(base_name);
+        (files, symbol_table_output_path)
     } else {
         panic!("Unable to find {}.", input_path.to_string_lossy());
     };
-    output_path.set_extension("vm");
-    (files, output_path)
+    symbol_table_output_path.set_extension("sym.xml");
+    (files, symbol_table_output_path)
 }

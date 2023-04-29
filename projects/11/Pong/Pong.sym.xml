@@ -1,0 +1,327 @@
+<symbol_table>
+  <class>
+    <name> Ball </name>
+    <field>
+      <name> y </name>
+      <number> 1 </number>
+    </field>
+    <field>
+      <name> lengthy </name>
+      <number> 3 </number>
+    </field>
+    <field>
+      <name> d </name>
+      <number> 4 </number>
+    </field>
+    <field>
+      <name> topWall </name>
+      <number> 12 </number>
+    </field>
+    <field>
+      <name> bottomWall </name>
+      <number> 13 </number>
+    </field>
+    <field>
+      <name> straightD </name>
+      <number> 5 </number>
+    </field>
+    <field>
+      <name> invert </name>
+      <number> 7 </number>
+    </field>
+    <field>
+      <name> diagonalD </name>
+      <number> 6 </number>
+    </field>
+    <field>
+      <name> wall </name>
+      <number> 14 </number>
+    </field>
+    <field>
+      <name> rightWall </name>
+      <number> 11 </number>
+    </field>
+    <field>
+      <name> positivey </name>
+      <number> 9 </number>
+    </field>
+    <field>
+      <name> leftWall </name>
+      <number> 10 </number>
+    </field>
+    <field>
+      <name> lengthx </name>
+      <number> 2 </number>
+    </field>
+    <field>
+      <name> x </name>
+      <number> 0 </number>
+    </field>
+    <field>
+      <name> positivex </name>
+      <number> 8 </number>
+    </field>
+    <method>
+      <name> bounce </name>
+      <local>
+        <name> newy </name>
+        <number> 1 </number>
+      </local>
+      <local>
+        <name> newx </name>
+        <number> 0 </number>
+      </local>
+      <arg>
+        <name> bouncingDirection </name>
+        <number> 0 </number>
+      </arg>
+      <local>
+        <name> divLengthx </name>
+        <number> 2 </number>
+      </local>
+      <local>
+        <name> divLengthy </name>
+        <number> 3 </number>
+      </local>
+      <local>
+        <name> factor </name>
+        <number> 4 </number>
+      </local>
+    </method>
+    <method>
+      <name> hide </name>
+    </method>
+    <method>
+      <name> getRight </name>
+    </method>
+    <constructor>
+      <name> new </name>
+      <arg>
+        <name> AleftWall </name>
+        <number> 2 </number>
+      </arg>
+      <arg>
+        <name> ArightWall </name>
+        <number> 3 </number>
+      </arg>
+      <arg>
+        <name> Ay </name>
+        <number> 1 </number>
+      </arg>
+      <arg>
+        <name> AbottomWall </name>
+        <number> 5 </number>
+      </arg>
+      <arg>
+        <name> Ax </name>
+        <number> 0 </number>
+      </arg>
+      <arg>
+        <name> AtopWall </name>
+        <number> 4 </number>
+      </arg>
+    </constructor>
+    <method>
+      <name> show </name>
+    </method>
+    <method>
+      <name> dispose </name>
+    </method>
+    <method>
+      <name> draw </name>
+    </method>
+    <method>
+      <name> getLeft </name>
+    </method>
+    <method>
+      <name> setDestination </name>
+      <local>
+        <name> dx </name>
+        <number> 0 </number>
+      </local>
+      <local>
+        <name> temp </name>
+        <number> 2 </number>
+      </local>
+      <arg>
+        <name> desty </name>
+        <number> 1 </number>
+      </arg>
+      <arg>
+        <name> destx </name>
+        <number> 0 </number>
+      </arg>
+      <local>
+        <name> dy </name>
+        <number> 1 </number>
+      </local>
+    </method>
+    <method>
+      <name> move </name>
+    </method>
+  </class>
+  <class>
+    <name> Bat </name>
+    <field>
+      <name> direction </name>
+      <number> 4 </number>
+    </field>
+    <field>
+      <name> y </name>
+      <number> 1 </number>
+    </field>
+    <field>
+      <name> height </name>
+      <number> 3 </number>
+    </field>
+    <field>
+      <name> width </name>
+      <number> 2 </number>
+    </field>
+    <field>
+      <name> x </name>
+      <number> 0 </number>
+    </field>
+    <method>
+      <name> dispose </name>
+    </method>
+    <method>
+      <name> draw </name>
+    </method>
+    <method>
+      <name> getRight </name>
+    </method>
+    <method>
+      <name> move </name>
+    </method>
+    <method>
+      <name> show </name>
+    </method>
+    <constructor>
+      <name> new </name>
+      <arg>
+        <name> Ax </name>
+        <number> 0 </number>
+      </arg>
+      <arg>
+        <name> Ay </name>
+        <number> 1 </number>
+      </arg>
+      <arg>
+        <name> Awidth </name>
+        <number> 2 </number>
+      </arg>
+      <arg>
+        <name> Aheight </name>
+        <number> 3 </number>
+      </arg>
+    </constructor>
+    <method>
+      <name> hide </name>
+    </method>
+    <method>
+      <name> getLeft </name>
+    </method>
+    <method>
+      <name> setDirection </name>
+      <arg>
+        <name> Adirection </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+    <method>
+      <name> setWidth </name>
+      <arg>
+        <name> Awidth </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+  </class>
+  <class>
+    <name> PongGame </name>
+    <field>
+      <name> ball </name>
+      <number> 1 </number>
+    </field>
+    <field>
+      <name> batWidth </name>
+      <number> 6 </number>
+    </field>
+    <field>
+      <name> wall </name>
+      <number> 2 </number>
+    </field>
+    <field>
+      <name> exit </name>
+      <number> 3 </number>
+    </field>
+    <field>
+      <name> score </name>
+      <number> 4 </number>
+    </field>
+    <static>
+      <name> instance </name>
+      <number> 0 </number>
+    </static>
+    <field>
+      <name> bat </name>
+      <number> 0 </number>
+    </field>
+    <field>
+      <name> lastWall </name>
+      <number> 5 </number>
+    </field>
+    <constructor>
+      <name> new </name>
+    </constructor>
+    <method>
+      <name> moveBall </name>
+      <local>
+        <name> bouncingDirection </name>
+        <number> 0 </number>
+      </local>
+      <local>
+        <name> batRight </name>
+        <number> 2 </number>
+      </local>
+      <local>
+        <name> batLeft </name>
+        <number> 1 </number>
+      </local>
+      <local>
+        <name> ballRight </name>
+        <number> 4 </number>
+      </local>
+      <local>
+        <name> ballLeft </name>
+        <number> 3 </number>
+      </local>
+    </method>
+    <method>
+      <name> dispose </name>
+    </method>
+    <function>
+      <name> getInstance </name>
+    </function>
+    <function>
+      <name> newInstance </name>
+    </function>
+    <method>
+      <name> run </name>
+      <local>
+        <name> key </name>
+        <number> 0 </number>
+      </local>
+    </method>
+  </class>
+  <class>
+    <name> Main </name>
+    <function>
+      <name> main </name>
+      <local>
+        <name> game </name>
+        <number> 0 </number>
+      </local>
+    </function>
+  </class>
+</symbol_table>

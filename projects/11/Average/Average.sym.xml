@@ -1,0 +1,24 @@
+<symbol_table>
+  <class>
+    <name> Main </name>
+    <function>
+      <name> main </name>
+      <local>
+        <name> i </name>
+        <number> 2 </number>
+      </local>
+      <local>
+        <name> length </name>
+        <number> 1 </number>
+      </local>
+      <local>
+        <name> sum </name>
+        <number> 3 </number>
+      </local>
+      <local>
+        <name> a </name>
+        <number> 0 </number>
+      </local>
+    </function>
+  </class>
+</symbol_table>
