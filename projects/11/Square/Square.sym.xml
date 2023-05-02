@@ -1,36 +1,5 @@
 <symbol_table>
   <class>
-    <name> SquareGame </name>
-    <field>
-      <name> square </name>
-      <number> 0 </number>
-    </field>
-    <field>
-      <name> direction </name>
-      <number> 1 </number>
-    </field>
-    <method>
-      <name> moveSquare </name>
-    </method>
-    <method>
-      <name> run </name>
-      <local>
-        <name> exit </name>
-        <number> 1 </number>
-      </local>
-      <local>
-        <name> key </name>
-        <number> 0 </number>
-      </local>
-    </method>
-    <constructor>
-      <name> new </name>
-    </constructor>
-    <method>
-      <name> dispose </name>
-    </method>
-  </class>
-  <class>
     <name> Main </name>
     <function>
       <name> main </name>
@@ -47,54 +16,133 @@
       <number> 1 </number>
     </field>
     <field>
-      <name> size </name>
-      <number> 2 </number>
-    </field>
-    <field>
       <name> x </name>
       <number> 0 </number>
     </field>
-    <method>
-      <name> dispose </name>
-    </method>
-    <method>
-      <name> moveUp </name>
-    </method>
+    <field>
+      <name> size </name>
+      <number> 2 </number>
+    </field>
     <method>
       <name> decSize </name>
-    </method>
-    <method>
-      <name> moveDown </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
     </method>
     <method>
       <name> draw </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
     </method>
     <method>
-      <name> incSize </name>
+      <name> moveDown </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
     </method>
     <method>
-      <name> erase </name>
-    </method>
-    <method>
-      <name> moveLeft </name>
-    </method>
-    <method>
-      <name> moveRight </name>
+      <name> moveUp </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
     </method>
     <constructor>
       <name> new </name>
       <arg>
-        <name> Ax </name>
-        <number> 0 </number>
+        <name> Asize </name>
+        <number> 2 </number>
       </arg>
       <arg>
         <name> Ay </name>
         <number> 1 </number>
       </arg>
       <arg>
-        <name> Asize </name>
-        <number> 2 </number>
+        <name> Ax </name>
+        <number> 0 </number>
       </arg>
     </constructor>
+    <method>
+      <name> dispose </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+    <method>
+      <name> erase </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+    <method>
+      <name> moveRight </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+    <method>
+      <name> moveLeft </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+    <method>
+      <name> incSize </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+  </class>
+  <class>
+    <name> SquareGame </name>
+    <field>
+      <name> square </name>
+      <number> 0 </number>
+    </field>
+    <field>
+      <name> direction </name>
+      <number> 1 </number>
+    </field>
+    <method>
+      <name> dispose </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+    <constructor>
+      <name> new </name>
+    </constructor>
+    <method>
+      <name> run </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+      <local>
+        <name> exit </name>
+        <number> 1 </number>
+      </local>
+      <local>
+        <name> key </name>
+        <number> 0 </number>
+      </local>
+    </method>
+    <method>
+      <name> moveSquare </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+    </method>
   </class>
 </symbol_table>

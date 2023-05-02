@@ -1,0 +1,252 @@
+function Examples.void_function 0
+push constant 0
+return
+function Examples.static_function 0
+push static 0
+return
+function Examples.multi_parameter_function 0
+push argument 1
+return
+function Examples.simple_constructor 0
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push pointer 0
+return
+function Examples.field_method 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function Examples.string_literal 0
+push constant 5
+call String.new 1
+push constant 104
+call String.appendChar 2
+push constant 101
+call String.appendChar 2
+push constant 108
+call String.appendChar 2
+push constant 108
+call String.appendChar 2
+push constant 111
+call String.appendChar 2
+return
+function Examples.true_literal 0
+push constant 0
+not
+return
+function Examples.false_literal 0
+push constant 0
+return
+function Examples.null_literal 0
+push constant 0
+return
+function Examples.neg_unary 0
+push constant 1
+neg
+return
+function Examples.not_unary 0
+push constant 0
+not
+return
+function Examples.call_static_function 0
+call Examples.static_function 0
+return
+function Examples.call_unqualified_method 0
+push argument 0
+pop pointer 0
+push pointer 0
+call Examples.field_method 1
+return
+function Examples.call_field_method 0
+push argument 0
+pop pointer 0
+push this 1
+call Examples.field_method 1
+return
+function Examples.call_multi_parameter_function 0
+push constant 1
+push constant 2
+push constant 3
+call Experiement.multi_parameter_function 3
+return
+function Examples.add_expression 0
+push constant 1
+push constant 2
+add
+return
+function Examples.sub_expression 0
+push constant 1
+push constant 2
+sub
+return
+function Examples.mult_expression 0
+push constant 1
+push constant 2
+call Math.multiply 2
+return
+function Examples.div_expression 0
+push constant 1
+push constant 2
+call Math.divide 2
+return
+function Examples.and_expression 0
+push constant 0
+push constant 0
+and
+return
+function Examples.or_expression 0
+push constant 0
+push constant 0
+or
+return
+function Examples.gt_expression 0
+push constant 1
+push constant 2
+gt
+return
+function Examples.lt_expression 0
+push constant 1
+push constant 2
+lt
+return
+function Examples.eq_expression 0
+push constant 1
+push constant 2
+eq
+return
+function Examples.indexed_expression 0
+push argument 0
+push constant 42
+add
+pop pointer 1
+push that 0
+return
+function Examples.complex_expression 0
+push constant 1
+push constant 2
+add
+push constant 3
+push constant 4
+call Math.multiply 2
+add
+return
+function Examples.do_statement 0
+call Examples.static_function 0
+pop temp 0
+push constant 0
+return
+function Examples.local_let_statement 1
+push constant 1
+pop local 0
+push local 0
+return
+function Examples.arg_let_statement 0
+push constant 1
+pop argument 0
+push argument 0
+return
+function Examples.field_let_statement 0
+push argument 0
+pop pointer 0
+push constant 1
+pop this 0
+push this 0
+return
+function Examples.static_let_statement 0
+push constant 1
+pop static 0
+push static 0
+return
+function Examples.indexed_let_statement 0
+push constant 1
+push constant 42
+push argument 0
+add
+pop pointer 1
+pop that 0
+push argument 0
+push constant 42
+add
+pop pointer 1
+push that 0
+return
+function Examples.if_statement 0
+push argument 0
+push argument 1
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 0
+pop argument 1
+label IF_FALSE0
+push argument 1
+return
+function Examples.if_else_statement 1
+push argument 0
+push argument 1
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 0
+pop local 0
+goto IF_END0
+label IF_FALSE0
+push argument 1
+pop local 0
+label IF_END0
+push local 0
+return
+function Examples.while_statement 1
+push constant 1
+pop local 0
+label WHILE_EXP0
+push argument 0
+push argument 1
+lt
+not
+if-goto WHILE_END0
+push local 0
+push constant 2
+call Math.multiply 2
+pop local 0
+push argument 0
+push constant 1
+add
+pop argument 0
+goto WHILE_EXP0
+label WHILE_END0
+push argument 0
+return
+function Examples.multiple_if_statement 1
+push argument 0
+push argument 1
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 0
+pop local 0
+goto IF_END0
+label IF_FALSE0
+push argument 1
+pop local 0
+label IF_END0
+push argument 1
+push constant 42
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 47
+pop local 0
+goto IF_END1
+label IF_FALSE1
+push constant 2
+pop argument 0
+label IF_END1
+push local 0
+return

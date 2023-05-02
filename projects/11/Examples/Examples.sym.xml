@@ -1,0 +1,213 @@
+<symbol_table>
+  <class>
+    <name> Examples </name>
+    <static>
+      <name> foo </name>
+      <number> 0 </number>
+    </static>
+    <field>
+      <name> bar </name>
+      <number> 0 </number>
+    </field>
+    <field>
+      <name> other </name>
+      <number> 1 </number>
+    </field>
+    <function>
+      <name> do_statement </name>
+    </function>
+    <function>
+      <name> multiple_if_statement </name>
+      <arg>
+        <name> a </name>
+        <number> 0 </number>
+      </arg>
+      <arg>
+        <name> b </name>
+        <number> 1 </number>
+      </arg>
+      <local>
+        <name> c </name>
+        <number> 0 </number>
+      </local>
+    </function>
+    <function>
+      <name> or_expression </name>
+    </function>
+    <function>
+      <name> local_let_statement </name>
+      <local>
+        <name> a </name>
+        <number> 0 </number>
+      </local>
+    </function>
+    <function>
+      <name> if_else_statement </name>
+      <local>
+        <name> c </name>
+        <number> 0 </number>
+      </local>
+      <arg>
+        <name> a </name>
+        <number> 0 </number>
+      </arg>
+      <arg>
+        <name> b </name>
+        <number> 1 </number>
+      </arg>
+    </function>
+    <function>
+      <name> eq_expression </name>
+    </function>
+    <function>
+      <name> call_static_function </name>
+    </function>
+    <function>
+      <name> multi_parameter_function </name>
+      <arg>
+        <name> b </name>
+        <number> 1 </number>
+      </arg>
+      <arg>
+        <name> c </name>
+        <number> 2 </number>
+      </arg>
+      <arg>
+        <name> a </name>
+        <number> 0 </number>
+      </arg>
+    </function>
+    <function>
+      <name> false_literal </name>
+    </function>
+    <function>
+      <name> static_function </name>
+    </function>
+    <function>
+      <name> void_function </name>
+    </function>
+    <function>
+      <name> string_literal </name>
+    </function>
+    <function>
+      <name> mult_expression </name>
+    </function>
+    <function>
+      <name> and_expression </name>
+    </function>
+    <function>
+      <name> indexed_expression </name>
+      <arg>
+        <name> a </name>
+        <number> 0 </number>
+      </arg>
+    </function>
+    <function>
+      <name> not_unary </name>
+    </function>
+    <method>
+      <name> field_method </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+    <function>
+      <name> call_multi_parameter_function </name>
+    </function>
+    <function>
+      <name> arg_let_statement </name>
+      <arg>
+        <name> a </name>
+        <number> 0 </number>
+      </arg>
+    </function>
+    <function>
+      <name> sub_expression </name>
+    </function>
+    <function>
+      <name> indexed_let_statement </name>
+      <arg>
+        <name> a </name>
+        <number> 0 </number>
+      </arg>
+    </function>
+    <method>
+      <name> call_unqualified_method </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+    <function>
+      <name> static_let_statement </name>
+    </function>
+    <function>
+      <name> true_literal </name>
+    </function>
+    <function>
+      <name> lt_expression </name>
+    </function>
+    <function>
+      <name> div_expression </name>
+    </function>
+    <function>
+      <name> if_statement </name>
+      <arg>
+        <name> a </name>
+        <number> 0 </number>
+      </arg>
+      <arg>
+        <name> b </name>
+        <number> 1 </number>
+      </arg>
+    </function>
+    <constructor>
+      <name> simple_constructor </name>
+    </constructor>
+    <function>
+      <name> add_expression </name>
+    </function>
+    <method>
+      <name> field_let_statement </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+    <function>
+      <name> complex_expression </name>
+    </function>
+    <function>
+      <name> neg_unary </name>
+    </function>
+    <function>
+      <name> gt_expression </name>
+    </function>
+    <function>
+      <name> null_literal </name>
+    </function>
+    <function>
+      <name> while_statement </name>
+      <local>
+        <name> c </name>
+        <number> 0 </number>
+      </local>
+      <arg>
+        <name> b </name>
+        <number> 1 </number>
+      </arg>
+      <arg>
+        <name> a </name>
+        <number> 0 </number>
+      </arg>
+    </function>
+    <method>
+      <name> call_field_method </name>
+      <arg>
+        <name> this </name>
+        <number> 0 </number>
+      </arg>
+    </method>
+  </class>
+</symbol_table>

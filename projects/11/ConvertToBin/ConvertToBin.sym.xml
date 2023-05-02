@@ -3,43 +3,36 @@
     <name> Main </name>
     <function>
       <name> convert </name>
-      <local>
-        <name> position </name>
-        <number> 1 </number>
-      </local>
       <arg>
         <name> value </name>
         <number> 0 </number>
       </arg>
       <local>
-        <name> mask </name>
-        <number> 0 </number>
+        <name> position </name>
+        <number> 1 </number>
       </local>
       <local>
         <name> loop </name>
         <number> 2 </number>
       </local>
+      <local>
+        <name> mask </name>
+        <number> 0 </number>
+      </local>
     </function>
     <function>
       <name> fillMemory </name>
       <arg>
-        <name> length </name>
-        <number> 1 </number>
+        <name> startAddress </name>
+        <number> 0 </number>
       </arg>
       <arg>
         <name> value </name>
         <number> 2 </number>
       </arg>
       <arg>
-        <name> startAddress </name>
-        <number> 0 </number>
-      </arg>
-    </function>
-    <function>
-      <name> nextMask </name>
-      <arg>
-        <name> mask </name>
-        <number> 0 </number>
+        <name> length </name>
+        <number> 1 </number>
       </arg>
     </function>
     <function>
@@ -48,6 +41,13 @@
         <name> value </name>
         <number> 0 </number>
       </local>
+    </function>
+    <function>
+      <name> nextMask </name>
+      <arg>
+        <name> mask </name>
+        <number> 0 </number>
+      </arg>
     </function>
   </class>
 </symbol_table>

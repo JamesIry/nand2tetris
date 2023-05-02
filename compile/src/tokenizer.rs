@@ -48,6 +48,8 @@ pub enum TokenError {
     IntegerOutOfRange(String),
     #[error("There was an IO error \n--\"{0}\"")]
     IOError(std::io::Error),
+    #[error("There was a character out of the range 0-127")]
+    CharacterOutOfBounds(char),
 }
 
 pub struct Tokenizer<T>
@@ -295,11 +297,14 @@ where
                 Action::Ignore,
                 Self::token_error(TokenError::UnclosedString),
             ),
-            _ => self.transition(
-                State::String,
-                Action::Accum(next.character()),
-                Self::no_token,
-            ),
+            _ => {
+                let character = next.character();
+                if character > 127 as char {
+                    Some(Err(TokenError::CharacterOutOfBounds(character)))
+                } else {
+                    self.transition(State::String, Action::Accum(character), Self::no_token)
+                }
+            }
         }
     }
 

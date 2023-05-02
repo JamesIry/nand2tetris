@@ -104,7 +104,7 @@ where
 
         self.leaf(indent + 1, "name", name)?;
 
-        for (name, (decorator, number)) in &table.class_vars {
+        for (name, (decorator, _, number)) in &table.class_vars {
             self.class_var_symbol(indent + 1, name, decorator, *number)?;
         }
 
@@ -145,7 +145,7 @@ where
         self.start(indent, sub_type)?;
         self.leaf(indent + 1, "name", name)?;
 
-        for (var, (decorator, number)) in &table.vars {
+        for (var, (decorator, _, number)) in &table.vars {
             self.subroutine_var_symbol(indent + 1, var, decorator, *number)?;
         }
 

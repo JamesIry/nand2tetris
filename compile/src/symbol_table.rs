@@ -13,6 +13,11 @@ pub enum SubroutineVarDecorator {
     Local,
 }
 
+pub enum RefType {
+    ClassRefType(ClassVarDecorator),
+    SubroutineRefType(SubroutineVarDecorator),
+}
+
 impl SymbolTable {
     pub fn new() -> Self {
         Self {
@@ -44,11 +49,16 @@ impl SymbolTable {
         &mut self,
         name: String,
         decorator: ClassVarDecorator,
+        type_name: Type,
     ) -> Result<(), ParseError> {
         let class_table = self.get_class_table_mut()?;
 
-        let field_number = match decorator {
-            ClassVarDecorator::Static => 0,
+        let var_number = match decorator {
+            ClassVarDecorator::Static => {
+                let result = class_table.static_number;
+                class_table.static_number += 1;
+                result
+            }
             ClassVarDecorator::Field => {
                 let result = class_table.field_number;
                 class_table.field_number += 1;
@@ -59,7 +69,7 @@ impl SymbolTable {
         swap_result(
             class_table
                 .class_vars
-                .insert(name, (decorator, field_number))
+                .insert(name, (decorator, type_name, var_number))
                 .map(|_| ParseError::DuplicatedClassLevelVariable)
                 .ok_or(()),
         )
@@ -70,12 +80,16 @@ impl SymbolTable {
         &mut self,
         subroutine: String,
         decorator: SubroutineDecorator,
+        type_name: Option<Type>,
     ) -> Result<(), ParseError> {
         let class_table = self.get_class_table_mut()?;
         swap_result(
             class_table
                 .subroutines
-                .insert(subroutine.clone(), SubroutineSymbolTable::new(decorator))
+                .insert(
+                    subroutine.clone(),
+                    SubroutineSymbolTable::new(decorator, type_name),
+                )
                 .map(|_| ParseError::DuplicatedSubroutine)
                 .ok_or(self.last_subroutine = subroutine),
         )
@@ -91,32 +105,35 @@ impl SymbolTable {
             .ok_or(ParseError::ClassNotFound)
     }
 
-    pub fn enter_arg(&mut self, name: String) -> Result<(), ParseError> {
+    pub fn enter_arg(&mut self, name: String, type_name: Type) -> Result<(), ParseError> {
         let subroutine_table = self.get_subroutine_table_mut()?;
         let arg_number = subroutine_table.arg_number;
         subroutine_table.arg_number = arg_number + 1;
         swap_result(
             subroutine_table
                 .vars
-                .insert(name, (SubroutineVarDecorator::Arg, arg_number))
+                .insert(name, (SubroutineVarDecorator::Arg, type_name, arg_number))
                 .map(|_| ParseError::DuplicatedFuncitonLevelVariable)
                 .ok_or(()),
         )
     }
 
-    pub fn enter_local(&mut self, name: String) -> Result<(), ParseError> {
+    pub fn enter_local(&mut self, name: String, type_name: Type) -> Result<(), ParseError> {
         let subroutine_table = self.get_subroutine_table_mut()?;
         let local_number = subroutine_table.local_number;
         subroutine_table.local_number = local_number + 1;
         swap_result(
             subroutine_table
                 .vars
-                .insert(name, (SubroutineVarDecorator::Local, local_number))
+                .insert(
+                    name,
+                    (SubroutineVarDecorator::Local, type_name, local_number),
+                )
                 .map(|_| ParseError::DuplicatedFuncitonLevelVariable)
                 .ok_or(()),
         )
     }
-    /*
+
     fn get_class_table(&self, class: &str) -> Result<&ClassSymbolTable, ParseError> {
         self.classes.get(class).ok_or(ParseError::ClassNotFound)
     }
@@ -134,38 +151,65 @@ impl SymbolTable {
             .ok_or(ParseError::ClassNotFound)
     }
 
-    fn lookup(
+    pub fn lookup_var(
         &self,
         class: &str,
         subroutine: &str,
         name: &str,
-    ) -> Result<(RefType, usize), ParseError> {
-        let class_table = self.get_class_table(class)?;
+    ) -> Result<(RefType, Type, usize), ParseError> {
+        let subroutine_table = self.get_subroutine_table(class, subroutine)?;
+        let subroutine_level =
+            subroutine_table
+                .vars
+                .get(name)
+                .map(|(ref_type, type_name, number)| {
+                    (
+                        RefType::SubroutineRefType(*ref_type),
+                        type_name.clone(),
+                        *number,
+                    )
+                });
 
-        let top_level = class_table
-            .class_vars
-            .get(class)
-            .map(|(ref_type, number)| (RefType::ClassRefType(*ref_type), *number));
-
-        match top_level {
+        match subroutine_level {
             Some(result) => Ok(result),
             None => {
-                let subroutine_table = self.get_subroutine_table(class, subroutine)?;
-                let subroutine_level = subroutine_table
-                    .vars
-                    .get(name)
-                    .map(|(ref_type, number)| (RefType::SubroutineRefType(*ref_type), *number));
-                subroutine_level.ok_or(ParseError::SymbolNotFound)
+                let class_table = self.get_class_table(class)?;
+                let class_level =
+                    class_table
+                        .class_vars
+                        .get(name)
+                        .map(|(ref_type, type_name, number)| {
+                            (RefType::ClassRefType(*ref_type), type_name.clone(), *number)
+                        });
+                class_level.ok_or(ParseError::SymbolNotFound)
             }
         }
     }
-    */
+
+    pub fn lookup_subroutine(
+        &self,
+        class: &str,
+        subroutine: &str,
+    ) -> Result<(SubroutineDecorator, usize, usize), ParseError> {
+        let sub_routine_table = self.get_subroutine_table(class, subroutine)?;
+        Ok((
+            sub_routine_table.decorator,
+            sub_routine_table.arg_number,
+            sub_routine_table.local_number,
+        ))
+    }
+
+    pub fn lookup_class(&self, class: &str) -> Result<usize, ParseError> {
+        let class_table = self.get_class_table(class)?;
+        Ok(class_table.field_number)
+    }
 }
 
 pub struct ClassSymbolTable {
-    pub class_vars: HashMap<String, (ClassVarDecorator, usize)>,
+    pub class_vars: HashMap<String, (ClassVarDecorator, Type, usize)>,
     pub subroutines: HashMap<String, SubroutineSymbolTable>,
-    field_number: usize,
+    pub static_number: usize,
+    pub field_number: usize,
 }
 
 impl ClassSymbolTable {
@@ -173,23 +217,26 @@ impl ClassSymbolTable {
         Self {
             class_vars: HashMap::new(),
             subroutines: HashMap::new(),
+            static_number: 0,
             field_number: 0,
         }
     }
 }
 
 pub struct SubroutineSymbolTable {
-    pub vars: HashMap<String, (SubroutineVarDecorator, usize)>,
+    pub vars: HashMap<String, (SubroutineVarDecorator, Type, usize)>,
     pub decorator: SubroutineDecorator,
-    arg_number: usize,
-    local_number: usize,
+    pub type_name: Option<Type>,
+    pub arg_number: usize,
+    pub local_number: usize,
 }
 
 impl SubroutineSymbolTable {
-    fn new(decorator: SubroutineDecorator) -> Self {
+    fn new(decorator: SubroutineDecorator, type_name: Option<Type>) -> Self {
         Self {
             vars: HashMap::new(),
             decorator,
+            type_name,
             arg_number: 0,
             local_number: 0,
         }

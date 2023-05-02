@@ -4,16 +4,16 @@
     <function>
       <name> main </name>
       <local>
-        <name> i </name>
-        <number> 2 </number>
-      </local>
-      <local>
         <name> length </name>
         <number> 1 </number>
       </local>
       <local>
         <name> sum </name>
         <number> 3 </number>
+      </local>
+      <local>
+        <name> i </name>
+        <number> 2 </number>
       </local>
       <local>
         <name> a </name>

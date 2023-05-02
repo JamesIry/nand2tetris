@@ -32,7 +32,7 @@ where
             symbol_table.enter_class(name.clone())?;
             self.require_opening_curly(())?;
             let vars = self.parse_class_vars(symbol_table)?;
-            let subroutines = self.parse_subroutines(symbol_table)?;
+            let subroutines = self.parse_subroutines(&name, symbol_table)?;
             let class = Class {
                 name,
                 vars,
@@ -69,7 +69,7 @@ where
         if let Some(decorator) = decorator {
             let (type_name, declarations) = self.parse_var_declarations()?;
             for name in &declarations {
-                symbol_table.enter_class_var(name.clone(), decorator)?;
+                symbol_table.enter_class_var(name.clone(), decorator, type_name.clone())?;
             }
             Ok(Some(ClassVarDecl {
                 decorator,
@@ -95,11 +95,12 @@ where
 
     fn parse_subroutines(
         &mut self,
+        class: &str,
         symbol_table: &mut SymbolTable,
     ) -> Result<Vec<Subroutine>, ParseError> {
         let mut subroutines = Vec::new();
         loop {
-            let subroutine = self.parse_subroutine_opt(symbol_table)?;
+            let subroutine = self.parse_subroutine_opt(class, symbol_table)?;
             match subroutine {
                 Some(s) => subroutines.push(s),
                 None => break Ok(subroutines),
@@ -109,6 +110,7 @@ where
 
     fn parse_subroutine_opt(
         &mut self,
+        class: &str,
         symbol_table: &mut SymbolTable,
     ) -> Result<Option<Subroutine>, ParseError> {
         let decorator = self.parse_subroutine_decorator_opt()?;
@@ -119,7 +121,10 @@ where
                 Some(self.parse_type()?)
             };
             let name = self.parse_identifier(ParseError::MissingSubroutineName)?;
-            symbol_table.enter_subroutine(name.clone(), decorator)?;
+            symbol_table.enter_subroutine(name.clone(), decorator, type_name.clone())?;
+            if decorator == SubroutineDecorator::Method {
+                symbol_table.enter_arg("this".to_string(), Type::Class(class.to_string()))?;
+            }
             let params = self.parse_params(symbol_table)?;
             self.require_opening_curly(())?;
             let vars = self.parse_subroutine_vars(symbol_table)?;
@@ -162,7 +167,7 @@ where
     fn parse_param(&mut self, symbol_table: &mut SymbolTable) -> Result<ParamDecl, ParseError> {
         let type_name = self.parse_type()?;
         let name = self.parse_identifier(ParseError::MissingVariable)?;
-        symbol_table.enter_arg(name.clone())?;
+        symbol_table.enter_arg(name.clone(), type_name.clone())?;
         Ok(ParamDecl { type_name, name })
     }
 
@@ -201,7 +206,7 @@ where
     ) -> Result<SubroutineVarDecl, ParseError> {
         let (type_name, declarations) = self.parse_var_declarations()?;
         for name in &declarations {
-            symbol_table.enter_local(name.clone())?;
+            symbol_table.enter_local(name.clone(), type_name.clone())?;
         }
         Ok(SubroutineVarDecl {
             type_name,

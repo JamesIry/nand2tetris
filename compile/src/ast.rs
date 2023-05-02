@@ -19,8 +19,7 @@ pub enum ClassVarDecorator {
     Static,
     Field,
 }
-
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone)]
 pub enum Type {
     Int,
     Char,
@@ -176,6 +175,6 @@ pub enum ParseError {
     DuplicatedSubroutine,
     #[error("Subroutine level var was duplicated")]
     DuplicatedFuncitonLevelVariable,
-    //   #[error("Could not find symbol")]
-    //   SymbolNotFound,
+    #[error("Could not find symbol")]
+    SymbolNotFound,
 }

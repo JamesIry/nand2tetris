@@ -8,9 +8,10 @@ use std::{
 };
 use utf8_chars::BufReadCharsExt;
 
-use crate::{parser::Parser, symbol_table::SymbolTable, tokenizer::Tokenizer};
+use crate::{emitter::Emitter, parser::Parser, symbol_table::SymbolTable, tokenizer::Tokenizer};
 
 mod ast;
+mod emitter;
 mod parser;
 mod symbol_table;
 mod tokenizer;
@@ -35,7 +36,7 @@ fn main() -> Result<()> {
             match args[2].as_str() {
                 "-output=tokens" => Output::Tokens,
                 "-output=ast" => Output::Ast,
-                "-output=symbol_table" => Output::SymbolTable,
+                "-output=symbol-table" => Output::SymbolTable,
                 "-output=vm" => Output::Vm,
                 _ => panic!("Unrecognized option {0}", args[2]),
             }
@@ -46,8 +47,34 @@ fn main() -> Result<()> {
         let input_path = Path::new(input_name);
         let (input_files, symbol_table_output_path) = create_output_path(input_path);
         let mut symbol_table = SymbolTable::new();
-        for input_file in input_files {
-            compile_file(input_file.as_path(), output, &mut symbol_table)?;
+        let mut classes = Vec::new();
+        for input_file in &input_files {
+            if let Some(class) = compile_file(input_file.as_path(), output, &mut symbol_table)? {
+                let mut output_path = input_file.to_path_buf();
+                output_path.set_extension("vm");
+                classes.push((output_path, class));
+            }
+        }
+
+        match output {
+            Output::Tokens => (),
+            Output::Ast => (),
+            Output::SymbolTable => {
+                println!("Creating {}", symbol_table_output_path.to_string_lossy());
+                let file = File::create(&symbol_table_output_path)?;
+                let writer = BufWriter::new(file);
+                let mut xml = Xml::new(writer);
+                xml.write_symbol_table(&symbol_table)?;
+            }
+            Output::Vm => {
+                for (output_path, class) in classes {
+                    println!("Creating {}", output_path.to_string_lossy());
+                    let file = File::create(&output_path)?;
+                    let writer = BufWriter::new(file);
+                    let mut emitter = Emitter::new(writer, &symbol_table);
+                    emitter.emit_class(&class)?;
+                }
+            }
         }
 
         if output == Output::SymbolTable {
@@ -122,7 +149,9 @@ fn compile_file(
             Ok(None)
         }
         Output::Vm => {
-            todo!()
+            let mut parser = Parser::new(tokens);
+            let class = parser.parse_class(symbol_table)?;
+            Ok(Some(class))
         }
     }
 }
