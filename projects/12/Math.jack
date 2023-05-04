@@ -8,13 +8,41 @@
  * Note: Jack compilers implement multiplication and division using OS method calls.
  */
 class Math {
+    static Array bits;
+    static int remainder;
 
     /** Initializes the library. */
     function void init() {
+
+        let bits = Array.new(16);
+        let bits[0] = 1;
+        let bits[1] = 2;
+        let bits[2] = 4;
+        let bits[3] = 8;
+        let bits[4] = 16;
+        let bits[5] = 32;
+        let bits[6] = 64;
+        let bits[7] = 128;
+        let bits[8] = 256;
+        let bits[9] = 512;
+        let bits[10] = 1024;
+        let bits[11] = 2048;
+        let bits[12] = 4096;
+        let bits[13] = 8192;
+        let bits[14] = 16384;
+        let bits[15] = bits[14] + bits[14];
+
+        return;
+        
     }
 
     /** Returns the absolute value of x. */
     function int abs(int x) {
+        if (x < 0) {
+            return -x;
+        } else {
+            return x;
+        }
     }
 
     /** Returns the product of x and y. 
@@ -23,6 +51,20 @@ class Math {
      *  the Jack expressions x*y and multiply(x,y) return the same value.
      */
     function int multiply(int x, int y) {
+        var int accum, bit;
+
+        let bit = 0;
+        let accum = 0;
+        while (bit < 16) {
+            if (y & bits[bit]) {
+                let accum = accum + x;
+            }
+
+            let x=x+x;
+            let bit=bit+1;
+        }
+
+        return accum;
     }
 
     /** Returns the integer part of x/y.
@@ -31,17 +73,95 @@ class Math {
      *  the Jack expressions x/y and divide(x,y) return the same value.
      */
     function int divide(int x, int y) {
+        var bool negative;
+
+        if (y = 0) {
+            do Sys.halt(); // TODO print error and halt
+        }
+
+        if (x < 0) {
+            let x = -x;
+            let negative = true;
+        } else {
+            let negative = false;
+        }
+
+        if (y < 0) {
+            let y = -y;
+            let negative = ~negative;
+        }
+        
+        let remainder = x;
+        let x = Math.divide_r(x, y);
+    
+        if (negative) {
+            return -x;
+        } else {
+            return x;
+        }
+    }
+
+    function int divide_r(int x, int y) {
+        var int q;
+
+        if ((y>x)|(y<0)) {
+            return 0;
+        }
+
+        let q = Math.divide_r(x, y+y);
+
+        if (y > remainder) {
+            return q+q;
+        } else {
+            let remainder = remainder - y;
+            return q+q+1;
+        }
     }
 
     /** Returns the integer part of the square root of x. */
     function int sqrt(int x) {
+        var int y, j, n, bit, temp;
+
+        if (x < 0) {
+            do Sys.halt(); // TODO print error and halt
+        }
+
+        let n = 0;
+        while ((n < 16) & ~(bits[n]>x)) {
+            let n = n + 1;
+        }
+
+        let y = 0;
+        let j = n/2; 
+        while (j>0) {
+            let j=j-1;
+            let bit = bits[j];
+            let temp = y + bit;
+            let temp = temp * temp;
+            if ((temp>0) & ~(temp > x)) {
+                let y = y + bit;
+            }
+
+        }
+
+        return y;
     }
 
     /** Returns the greater number. */
     function int max(int a, int b) {
+        if (a > b) {
+            return a;
+        } else {
+            return b;
+        }
     }
 
     /** Returns the smaller number. */
     function int min(int a, int b) {
+        if (a < b) {
+            return a;
+        } else {
+            return b;
+        }
     }
 }

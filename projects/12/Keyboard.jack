@@ -10,6 +10,8 @@ class Keyboard {
 
     /** Initializes the keyboard. */
     function void init() {
+        // TODO
+        return;
     } 
 
     /**
@@ -33,6 +35,8 @@ class Keyboard {
      * F1 - F12 = 141 - 152
      */
     function char keyPressed() {
+        // TODO
+        return 0;
     }
 
     /**								
@@ -41,6 +45,8 @@ class Keyboard {
      * of the pressed key.
      */
     function char readChar() {
+        // TODO
+        return 0;
     }
 
     /**								
@@ -49,6 +55,8 @@ class Keyboard {
      * and returns its value. Also handles user backspaces.
      */
     function String readLine(String message) {
+        // TODO
+        return null;
     }   
 
     /**								
@@ -58,5 +66,7 @@ class Keyboard {
      * entered text is detected). Also handles user backspaces. 
      */
     function int readInt(String message) {
+        // TODO
+        return 0;
     }
 }
