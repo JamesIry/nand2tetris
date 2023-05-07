@@ -7,6 +7,10 @@
  * A library that supports various program execution services.
  */
 class Sys {
+    // errors
+    // 0 = divide by zero
+    // 1 = out of memory
+    // 2 = argument out of range
 
     /** Performs all the initializations required by the OS. */
     function void init() {
@@ -32,14 +36,31 @@ class Sys {
 
     /** Waits approximately duration milliseconds and returns.  */
     function void wait(int duration) {
-        // TODO
+        var int i;
+        while (i<duration) {
+            do Sys.waitMillisecond();
+            let i=i+1;
+        }
+        return;
+    }
+
+    function void waitMillisecond() {
+        var int i;
+        while (i<117) {
+            let i=i+1;
+        }
         return;
     }
 
     /** Displays the given error code in the form "ERR<errorCode>",
      *  and halts the program's execution. */
     function void error(int errorCode) {
-        // TODO
+        do Output.printChar(69);
+        do Output.printChar(82);
+        do Output.printChar(82);
+        do Output.printChar(60);
+        do Output.printInt(errorCode);
+        do Output.printChar(62);
         do Sys.halt();
         return;
     }

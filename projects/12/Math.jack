@@ -76,7 +76,7 @@ class Math {
         var bool negative;
 
         if (y = 0) {
-            do Sys.halt(); // TODO print error and halt
+            do Sys.error(0);
         }
 
         if (x < 0) {
@@ -101,6 +101,11 @@ class Math {
         }
     }
 
+    function int mod(int x, int y) {
+        do Math.divide(x,y);
+        return remainder;
+    }
+
     function int divide_r(int x, int y) {
         var int q;
 
@@ -123,7 +128,7 @@ class Math {
         var int y, j, n, bit, temp;
 
         if (x < 0) {
-            do Sys.halt(); // TODO print error and halt
+            do Sys.error(0);
         }
 
         let n = 0;

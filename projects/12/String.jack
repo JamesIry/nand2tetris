@@ -11,78 +11,186 @@
  * string-oriented operations.
  */
 class String {
+    field int max, current;
+    field Array storage;
 
     /** constructs a new empty string with a maximum length of maxLength
      *  and initial length of 0. */
     constructor String new(int maxLength) {
-        // TODO
+        if (maxLength < 1) {
+            let maxLength = 0;
+        }
+        let storage = Array.new(maxLength);
+        let max = maxLength;
+        let current = 0;
+
         return this;
     }
 
     /** Disposes this string. */
     method void dispose() {
-        // TODO
+        do storage.dispose();
         return;
     }
 
     /** Returns the current length of this string. */
     method int length() {
-        // TODO
-        return 0;
+        return current;
     }
 
     /** Returns the character at the j-th location of this string. */
     method char charAt(int j) {
-        // TODO
-        return 0;
+        if (~(j < current)) {
+            do Sys.error(2);
+        }
+
+        return storage[j];
     }
 
     /** Sets the character at the j-th location of this string to c. */
     method void setCharAt(int j, char c) {
-        // TODO
+        if (~(j < current)) {
+            do Sys.error(2);
+        }
+        let storage[j] = c;
+
         return;
     }
 
     /** Appends c to this string's end and returns this string. */
     method String appendChar(char c) {
-        // TODO
-        return null;
+        var int i;
+        var Array newStorage;
+
+        if (current = max) {
+            do grow();
+        }
+
+        let storage[current] = c;
+        let current = current + 1;
+
+        return this;
+    }
+
+    method void grow() {
+        var int i;
+        var Array newStorage;
+
+        let max = max + max;
+        if (max < 0) {
+            do Sys.error(1);
+        }
+        let newStorage = Array.new(max);
+
+        let i = 0;
+        while (i<current) {
+            let newStorage[i] = storage[i];
+            let i=i+1;
+        }
+
+        do storage.dispose();
+        let storage = newStorage;
+
+        return;
     }
 
     /** Erases the last character from this string. */
     method void eraseLastChar() {
-        // TODO
+        if (current > 0) {
+            let current = current - 1;
+        }
         return;
     }
 
     /** Returns the integer value of this string, 
      *  until a non-digit character is detected. */
     method int intValue() {
-        // TODO
-        return 0;
+        var int accum, i;
+        var bool negative;
+
+        let i = 0;
+        let accum = 0;
+
+        if ((0 < current) & (storage[0] = 45)) {
+            let i = 1;
+            let negative = true;
+        } else {
+            let negative = false;
+        }
+
+        while ((i < current) & (storage[i]>47) & (storage[i]<58)) {
+            let accum = (accum*10) + (storage[i] - 48);
+            let i = i+1;
+        }
+
+        if (negative) {
+            let accum = -accum;
+        }
+
+        return accum;
     }
 
     /** Sets this string to hold a representation of the given value. */
     method void setInt(int val) {
-        // TODO
+        var bool negative;
+        var int temp;
+
+        let current = 0;
+
+        if (val = 0) {
+            do appendChar(48);
+        } else {
+            if (val < 0) {
+                let negative = true;
+                let val = -val;
+            } else {
+                let negative = false;
+            }
+
+            while (val > 0) {
+                let temp = val / 10;
+                do appendChar(val-(temp*10)+48);
+                let val = temp;
+            }
+
+            if (negative) {
+                do appendChar(45);
+            }
+
+            do reverse();
+        }
+
+        return;
+    }
+
+    method void reverse() {
+        var int i, mid;
+        var char temp;
+
+        let i = 0;
+        let mid = current / 2;
+        while (i < mid) {
+            let temp=storage[i];
+            let storage[i] = storage[current-i-1];
+            let storage[current-i-1] = temp;
+            let i = i + 1;
+        }
+
         return;
     }
 
     /** Returns the new line character. */
     function char newLine() {
-        // TODO
-        return 0;
+        return 128;
     }
 
     /** Returns the backspace character. */
     function char backSpace() {
-        // TODO
-        return 0;
+        return 129;
     }
 
     /** Returns the double quote (") character. */
     function char doubleQuote() {
-        // TODO
-        return 0;
+        return 34;
     }
 }

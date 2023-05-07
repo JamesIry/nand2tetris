@@ -1,0 +1,12 @@
+class Main {
+    function void main() {
+        do Screen.setColor(true);
+
+        do Sys.wait(10000);
+
+        do Screen.drawLine(0,0, 100, 100);
+
+
+        return;
+    }
+}
