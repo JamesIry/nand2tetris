@@ -1,0 +1,1 @@
+A complete implementation of all the projects in "The Elements of Computing Systems: Building a Modern Computer from First Principles" by Noam Nisan, Shimon Schocken. This code was built on the skeleton project located at [From Nand To Tetris](https://www.nand2tetris.org/). In keeping with the goals of the exercises I didn't spend much effort on omptimization or error handling.
